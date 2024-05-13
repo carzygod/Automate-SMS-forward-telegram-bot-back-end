@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 const tg = require("./tg")
 require('dotenv').config()
 
+var timecheck = {}
+
 tg.init()
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -28,6 +30,17 @@ app.get('/ping', async function(req, res) {
 
 app.get('/sms', async function(req, res) {
     console.log(req.query)
+    const time = req.query.time;
+    if(timecheck[time])
+    {
+        res.status(200).send({
+            "code": 200,
+            "data": 'already'
+        })
+        return false;
+    }
+    timecheck[time] = true;
+
     const bot = tg.getBot()
     await bot.sendMessage(process.env.UID,
 `*Recive SMS message from :*
@@ -44,7 +57,7 @@ app.get('/sms', async function(req, res) {
     });
     res.status(200).send({
         "code": 200,
-        "data": res.locals.auth
+        "data": 'success'
     })
 })
 
